@@ -1,0 +1,108 @@
+<%- include('includes/head.ejs', {username: username}) %>
+
+ 
+<div class="p-4 sm:ml-20 sm:mr-10 font-sans">
+  <div class="flex flex-col justify-right p-4 border-2 border-gray-200 rounded-lg dark:border-gray-700 bg-slate-200" style="height:970px;" >
+      <div class="inline-flex justify-between items-center">
+        <span style='font-size:30px;'>🎭 Roles</span>
+          <div class="flex space-x-2">
+              <a href="/Roles/agregar">
+                  <button class="bg-white hover:bg-indigo-600 text-black hover:text-white py-2 px-4 rounded-full transition duration-300" >Agregar Rol</button>
+              </a>
+          </div>
+      </div>
+          <div class="flex flex-col items-center justify-center h-screen">
+              <div class="w-full max-w-2x1 h-full">
+                  <div class="flex justify-center sm:mt-4 p-1 border-1 border-gray-200 rounded-lg dark:border-gray-200 bg-white">
+                      <table class="text-left w-full border-collapse">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">
+                                    Id
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Rol
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Modificar
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Eliminar
+                                </th>
+                            </tr>
+                        </thead>
+            <!-- Fin de simulación de datos -->
+            <% let contador = 1; %>
+            <% for (let ro of rol) { %>
+                <tr class="hover:bg-gray-200">
+                  <td class="py-4 px-6 border-b border-gray-200"><%= contador %></td>
+                  <td class="py-4 px-6 border-b border-gray-200"><%= ro.TipoRol %></td>
+                  <td class="py-4 px-6 border-b border-gray-200">
+                    <form action="/privilegios/<%= ro.IDRol %>" method="GET">
+                      <input type="hidden" name="IDRol" value="<%= ro.IDRol %>">
+                        <button type="submit" class="px-4 py-2 text-white font-bold bg-blue-500 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Modificar
+                        </button>
+                    </form>
+                </td>
+                  <td class="py-4 px-6 border-b border-gray-200">
+                    <button type="button" data-id="<%= ro.IDRol %>" class="px-4 py-2 text-white font-bold bg-red-500 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 deleteButton">
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+                <% contador++; %>
+              <% } %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+<script>
+  document.querySelectorAll('.deleteButton').forEach(function(button) {
+      button.addEventListener('click', function(event) {
+          event.preventDefault();
+          var idRol = this.getAttribute('data-id');
+          swal({
+              title: '¿Estás seguro?',
+              text: 'Una vez eliminado, no podrás recuperar este rol.',
+              icon: 'warning',
+              buttons: true,
+              dangerMode: true,
+          })
+          .then((willDelete) => {
+              if (willDelete) {
+                  fetch('/Roles/eliminar', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/x-www-form-urlencoded',
+                      },
+                      body: 'IDRol=' + encodeURIComponent(idRol),
+                  })
+                  .then(response => {
+                      if (!response.ok) {
+                          throw new Error('Network response was not ok');
+                      }
+                      return response.text();
+                  })
+                  .then(() => {
+                      swal('El rol ha sido eliminado.', {
+                          icon: 'success',
+                      });
+                      this.parentElement.parentElement.remove(); // Eliminar la fila de la tabla
+                  })
+                  .catch((error) => {
+                      console.error('Error:', error);
+                      swal('Error al eliminar el rol.', {
+                          icon: 'error',
+                      });
+                  });
+              }
+          });
+      });
+  });
+  </script>

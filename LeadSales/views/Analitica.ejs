@@ -1,0 +1,177 @@
+<%- include('includes/head.ejs', {username: username}) %>
+
+<div class="p-4 sm:ml-20 sm:mr-10 font-sans">
+    <div class="flex flex-col justify-right p-4 border-2 border-gray-200 rounded-lg dark:border-gray-700 bg-b" style="height:970px; overflow-y:visible;">
+        <div class="inline-flex justify-between items-center">
+          <span style='font-size:30px;'>👥 Analíticas</span>
+        </div>
+        <div class="flex flex-col items-center h-full">
+            <div class="max-w-2x1" style="width: 50%; height: 50%; background-color: #ffffff; border: 0px solid #444; box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 15px;">
+                <select id="dateRange" class=" bg-white rounded-md shadow-sm focus:outline-none text-ellipsis" style=" margin-bottom: 0px; position:relative; left: 656px;">
+                    <option value="1">Una semana</option>
+                    <option value="2">Un mes</option>
+                    <option value="3">Un semestre</option>
+                    <option value="4">Un año</option>
+                  </select>
+            <canvas id="leadsChart"></canvas> 
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<script>
+    // Establecer la opción seleccionada tan pronto como se carga el script
+    const selectedRange = localStorage.getItem('selectedRange'); // Obtener el rango seleccionado
+    if (selectedRange) {
+        document.getElementById('dateRange').value = selectedRange; // Establecer la opción seleccionada
+    }
+
+    // Datos de ejemplo
+    const data = <%- JSON.stringify(leadsPerDay) %>.map(item => ({
+        ...item,
+        Fecha: new Date(item.Fecha)
+    }));
+    // Obtener el contexto del canvas para después crear la gráfica
+    const ctx = document.getElementById('leadsChart').getContext('2d');
+
+    // Función para formatear la fecha
+    function formatDate(date, range) {
+        switch (parseInt(range)) {
+            case 1: // Semana
+                return moment(date).format('D'); // Solo el día del mes
+            case 2: // Mes
+                return moment(date).format('D'); // Solo el día del mes
+            case 3: // Semestre
+                return moment(date).format('MMM'); // Solo el mes
+            case 4: // Año
+                return moment(date).format('MMM'); // Solo el mes
+            default:
+                throw new Error('Invalid range');
+        }
+    }
+
+    // Función para obtener el texto del label
+    function getLabelText(range) {
+        switch (parseInt(range)) {
+            case 1: // Semana
+            case 2: // Mes
+                return 'Leads por día';
+            case 3: // Semestre
+            case 4: // Año
+                return 'Leads por mes';
+            default:
+                throw new Error('Invalid range');
+        }
+    }
+
+let myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: data.map(item => formatDate(item.Fecha, selectedRange)), // Usar la función formatDate
+        datasets: [{
+            label: getLabelText(selectedRange), // Usar la función getLabelText
+            data: data.map(item => item.CantidadLeads),
+                backgroundColor: 'rgba(23, 16, 198, 0.2)',
+                pointStyle: 'star', // Cambiar la forma de los puntos a triángulos
+                borderColor: 'rgba(23, 16, 198, 0.8)',
+                borderWidth: 5,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgba(23, 16, 198, 0.8)',
+                tension: 0.3,
+                fill: true,
+                point: {
+                    onHover: (event, point, dataset, context) => {
+                        event.native.target.style.cursor = 'pointer';
+                    },
+                    onLeave: (event, point, dataset, context) => {
+                        event.native.target.style.cursor = 'default';
+                    }
+                }
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false,
+                        drawOnChartArea: false
+                    }
+                },
+                x: {
+                    grid: {
+                        drawBorder: false,
+                        drawOnChartArea: false
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    intersect: false,
+                    mode: 'index',
+                    displayColors: false,
+                    callbacks: {
+                        title: function(tooltipItem) {
+                            return getLabelText(selectedRange); // Usar la función getLabelText
+                        },
+                        label: function(context) {
+                            var label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('es-ES').format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [{
+            id: 'custom_grid_lines',
+            beforeDraw: (chart, args, options) => {
+                const {ctx, scales} = chart;
+                const {x: xAxis} = scales;
+                ctx.save();
+                xAxis.ticks.forEach((value, index) => {
+                    if (index === 0) return;
+                    const xPos = xAxis.getPixelForTick(index);
+                    ctx.setLineDash([4, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(xPos, scales.y.top);
+                    ctx.lineTo(xPos, scales.y.bottom);
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                    ctx.stroke();
+                });
+                ctx.restore();
+            }
+        }]
+    });
+
+
+
+    document.getElementById('dateRange').addEventListener('change', function(event) {
+    event.preventDefault(); // Evitar la recarga de la página
+    const selectedRange = this.value;
+    localStorage.setItem('selectedRange', selectedRange); // Guardar el rango seleccionado
+
+    // Hacer una solicitud AJAX para obtener los datos
+    fetch('/lead/analitics/' + selectedRange)
+        .then(response => response.json())
+        .then(data => {
+            // Formatear las fechas y actualizar la gráfica con los nuevos datos
+            myChart.data.labels = data.map(item => formatDate(item.Fecha, selectedRange));
+            myChart.data.datasets[0].data = data.map(item => item.CantidadLeads);
+            myChart.data.datasets[0].label = getLabelText(selectedRange); // Actualizar el label del dataset
+            myChart.options.plugins.tooltip.callbacks.title = function(tooltipItem) {
+                return getLabelText(selectedRange); // Actualizar el título del tooltip
+            };
+            myChart.update();
+        });
+});
+</script>

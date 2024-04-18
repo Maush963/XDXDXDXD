@@ -1,0 +1,72 @@
+<%- include('includes/head.ejs', {username: username}) %>
+
+<div class="overflow-x-auto flex justify-center items-center h-screen">
+    <div style="background-color: white; width: 50%; height: 835px; margin: 20px auto 20px; padding: 40px 40px; border: 1px solid #ddd; position: relative;">
+        <button id="close-button" class="text-black hover:text-blue-700" style="border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 30px; margin: 0; cursor: pointer; position: absolute; top: 10px; right: 20px; transition: background-color 0.3s ease; border-radius: 50%;">X</button>
+        
+        <div class="flex justify-between">
+            <div style="width: 45%; margin-right: 5%; margin-top: 70px;">
+                <img src="/uploads/swordsman.png" alt="Imagen no encontrada" style="width: 180px; height: 180px; display: block; margin: 0 auto; margin-left: 110px;">
+                <h1 class="text-4xl font-bold dark:text-ellipsis" style="text-align: center; margin: 10px auto 20px;">Crear Rol</h1>
+                <form style="margin-top: 30px;">
+                    <label for="nombreRol" class="block text-sm font-medium text-gray-700">Nombre del Rol</label>
+                    <input type="text" name="nombreRol" id="nombreRol" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <button id="crear-rol" type="submit" class="mt-3 w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Crear Rol</button>
+                </form>
+            </div>
+            <div class="overflow-y-scroll overflow-x-clip" style="width: 50%; border: 1px solid #ddd; border-radius: 8px; max-height: 650px; margin-top: 70px;">        
+        <table style="width: 100%;" class="divide-y divide-gray-200">
+                <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                        <th scope="col" class="px-8 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Añadir privilegios
+                        </th>
+                        <th scope="col" class="px-8 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <!-- Se recorren los privilegios y se muestran en la tabla -->
+                    <% let cont=0;
+                    for (let descripcion in funciones) {
+                        cont=cont+1;
+                        if(cont>2) { %>
+                        <tr>
+                            <td class="p-3 text-sm font-semibold tracking-wide text-left"><%= funciones[descripcion].id -2 %>. <%= descripcion %></td>
+                            <td style="text-align: center;">
+                                <input type="checkbox" class="privilege-checkbox" 
+                                data-privilege="<%= funciones[descripcion].id %>"  
+                                style="width: 20px; height: 20px; margin-right: 50%;">
+                            </td>
+                        </tr>
+                <% }} %>
+
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/scripts/agregarRol.js"></script>
+
+<style>
+    /* Estilos para la barra de desplazamiento en navegadores webkit (como Chrome y Safari) */
+    ::-webkit-scrollbar {
+        width: 10px; /* Ancho de la barra de desplazamiento */
+    }
+
+    /* Estilo de la barra de desplazamiento */
+    ::-webkit-scrollbar-thumb {
+        background-color: #8888887b; /* Color de fondo de la barra de desplazamiento */
+        border-radius: 5px; /* Redondeado de los bordes de la barra de desplazamiento */
+    
+    }
+
+    /* Estilo del riel de la barra de desplazamiento */
+    ::-webkit-scrollbar-track {
+        background-color: #f1f1f1; /* Color del riel de la barra de desplazamiento */
+        border-radius: 5px; /* Redondeado de los bordes de la barra de desplazamiento */
+    }
+    
+</style>

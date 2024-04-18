@@ -1,0 +1,96 @@
+<%- include('includes/head.ejs', {username: username}) %>
+
+ 
+<div class="p-4 sm:ml-20 sm:mr-10 font-sans">
+  <div class="flex flex-col justify-right p-4 border-2 border-gray-200 rounded-lg dark:border-gray-700 bg-slate-200" style="height:970px; overflow-y:visible;">
+      <div class="inline-flex justify-between items-center">
+        <span style='font-size:30px;'>👥 Mi Equipo</span>
+            <input type="text" id="search" name="q" placeholder="Buscar usuario" class="search-bar py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" style="padding-left: 20px; padding-right: 350px; "><br><br>
+          <div class="" style="padding-right: 0px;">
+              <a href="/Roles/consultas">
+                  <button class="bg-white hover:bg-indigo-600 text-black hover:text-white py-2 px-4 rounded-full transition duration-300">Roles</button>
+              </a>
+          </div>
+      </div>
+          <div class="flex flex-col items-center justify-center h-screen">
+              <div class="w-full max-w-2x1 h-full">
+                  <div class="flex justify-center sm:mt-4 p-1 border-1 border-gray-200 rounded-lg dark:border-gray-200 bg-white" style="height:auto; overflow-y: auto;  overflow-x: hidden;">
+                    <table class="t text-left w-full border-collapse">
+                          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">
+                                    Nombre del Usuario
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Rol
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Última actualización del Rol
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Modificar
+                                </th>
+                            </tr>
+                        </thead>
+                          <tbody id="tabla">
+                            <% data.forEach(function(item) { %>
+                                <tr class="hover:bg-gray-100">
+                                    <td class="py-4 px-6 border-b border-gray-200"><%= item.UserName %></td>
+                                    <td class="py-4 border-b border-gray-200" style="padding-right: 40px;">
+                                        <select id="rol-<%= item.IDUsuario %>" onchange="cambiarRol('<%= item.IDUsuario %>')" class="px-4 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            <% roles.forEach(function(rol) { %>
+                                                <option value="<%= rol.IDRol %>" <%= rol.IDRol == item.IDRol ? 'selected' : '' %>><%= rol.TipoRol %></option>
+                                            <% }); %>
+                                        </select>
+                                    </td>
+                                    <td class="py-4 border-b border-gray-200" style="padding-left: 70px;"><%= item.FechaUsuarioRolActualizacion %></td>
+                                    <td class="py-4 px-6 border-b border-gray-200">
+                                      <form action="/Roles/editar/<%= item.IDUsuario %>" method="GET">
+                                          <input type="hidden" name="IDUsuario" value="<%= item.IDUsuario %>">
+                                            <button type="submit" class="px-4 py-2 text-white font-bold bg-blue-500 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                Modificar
+                                            </button>
+                                        </form>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="/scripts/equipo.js"></script>
+
+<style>
+    .search-bar {
+    background-color: white;
+    transition: background-color 0.3s ease;
+    }
+
+    .search-bar:hover {
+        background-color: transparent;
+    }
+
+    /* Estilos para la barra de desplazamiento en navegadores webkit (como Chrome y Safari) */
+    ::-webkit-scrollbar {
+        width: 10px; /* Ancho de la barra de desplazamiento */
+    }
+
+    /* Estilo de la barra de desplazamiento */
+    ::-webkit-scrollbar-thumb {
+        background-color: #8888887b; /* Color de fondo de la barra de desplazamiento */
+        border-radius: 5px; /* Redondeado de los bordes de la barra de desplazamiento */
+    
+    }
+
+    /* Estilo del riel de la barra de desplazamiento */
+    ::-webkit-scrollbar-track {
+        background-color: #f1f1f1; /* Color del riel de la barra de desplazamiento */
+        border-radius: 5px; /* Redondeado de los bordes de la barra de desplazamiento */
+    }
+    
+    
+</style>
+

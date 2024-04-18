@@ -1,0 +1,68 @@
+<%- include('includes/head.ejs', {username: username}) %>
+
+<div class="overflow-x-auto flex justify-center items-center h-screen">
+    <div style="background-color: white; width: 50%; height: 835px; margin: 20px auto 20px; padding: 40px 40px; border: 1px solid #ddd; position: relative;">
+        <button id="close-button" class="text-black hover:text-blue-700" style="border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 30px; margin: 0; cursor: pointer; position: absolute; top: 10px; right: 20px; transition: background-color 0.3s ease; border-radius: 50%;">X</button>
+        <img src="/uploads/privilege.png" alt="Imagen no encontrada" style="width: 150px; height: 150px; display: block; margin: 0 auto;">
+        <h1 class="text-4xl font-bold dark:text-ellipsis" style="text-align: center; margin: 10px auto 20px;">Privilegios por Rol</h1>
+        <div class="overflow-y-scroll" style="width: 80%; margin: 40px auto; border: 1px solid #ddd; border-radius: 8px; max-height: 500px;">
+            <table style="width: 100%;" class="divide-y divide-gray-200">
+            <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Privilegios
+                </th>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <%= nombreRol %>
+                </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <!-- Se recorren los privilegios y se muestran en la tabla -->
+                <% let cont=0;
+                for (let descripcion in funcionesRoles) { 
+                    <!-- Se verifica si el rol tiene el privilegio asignado -->
+                    cont=cont+1;
+                    if(cont>2){
+                    let shouldCheck = funcionesRoles[descripcion].roles.some(role => role.nombre && role.nombre === nombreRol);
+                %>
+                    <tr>
+                        <td class="p-3 text-sm font-semibold tracking-wide text-left"><%= funcionesRoles[descripcion].id -2 %>. <%= descripcion %></td>
+                        <td style="text-align: center;">
+                            <input type="checkbox" class="privilege-checkbox" 
+                            data-role="<%= funcionesRoles[descripcion].roles && funcionesRoles[descripcion].roles[0] ? funcionesRoles[descripcion].roles[0].id : '' %>" 
+                            data-privilege="<%= funcionesRoles[descripcion].id %>"  
+                            style="width: 20px; height: 20px; margin-right: 50%;" 
+                            <% if(shouldCheck) { %> checked <% } %>>
+                        </td>
+                    </tr>
+                <% }} %>
+            </tbody>
+            </table>
+        </div>
+        <button id="save-changes" class="bg-blue-500 hover:bg-blue-700 text-white font-bold" style="padding: 10px 18px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 40px auto 0px; cursor: pointer; position: absolute; bottom: 5px; right: 40px; transition: background-color 0.3s ease; border-radius: 10px;">Guardar cambios</button>
+    </div>
+</div>
+
+<script src="/scripts/privilegios.js"></script>
+
+<style>
+    /* Estilos para la barra de desplazamiento en navegadores webkit (como Chrome y Safari) */
+    ::-webkit-scrollbar {
+        width: 10px; /* Ancho de la barra de desplazamiento */
+    }
+
+    /* Estilo de la barra de desplazamiento */
+    ::-webkit-scrollbar-thumb {
+        background-color: #8888887b; /* Color de fondo de la barra de desplazamiento */
+        border-radius: 5px; /* Redondeado de los bordes de la barra de desplazamiento */
+    
+    }
+
+    /* Estilo del riel de la barra de desplazamiento */
+    ::-webkit-scrollbar-track {
+        background-color: #f1f1f1; /* Color del riel de la barra de desplazamiento */
+        border-radius: 5px; /* Redondeado de los bordes de la barra de desplazamiento */
+    }
+    
+</style>
